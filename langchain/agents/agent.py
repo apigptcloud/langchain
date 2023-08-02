@@ -396,6 +396,7 @@ class Agent(BaseSingleActionAgent):
     intermediary work.
     """
 
+    language = "en"
     llm_chain: LLMChain
     output_parser: AgentOutputParser
     allowed_tools: Optional[List[str]] = None
@@ -678,6 +679,7 @@ s
     trim_intermediate_steps: Union[
         int, Callable[[List[Tuple[AgentAction, str]]], List[Tuple[AgentAction, str]]]
     ] = -1
+    language: Optional[str] = "en"
 
     @classmethod
     def from_agent_and_tools(
@@ -685,11 +687,12 @@ s
         agent: Union[BaseSingleActionAgent, BaseMultiActionAgent],
         tools: Sequence[BaseTool],
         callback_manager: Optional[BaseCallbackManager] = None,
+        language: Optional[str] = "en",
         **kwargs: Any,
     ) -> AgentExecutor:
         """Create from agent and tools."""
         return cls(
-            agent=agent, tools=tools, callback_manager=callback_manager, **kwargs
+            agent=agent, tools=tools, callback_manager=callback_manager, language=language, **kwargs
         )
 
     @root_validator()
@@ -882,6 +885,7 @@ s
                     verbose=self.verbose,
                     color=None,
                     callbacks=run_manager.get_child() if run_manager else None,
+                    language=self.language,
                     **tool_run_kwargs,
                 )
             result.append((agent_action, observation))
@@ -977,6 +981,7 @@ s
                     verbose=self.verbose,
                     color=None,
                     callbacks=run_manager.get_child() if run_manager else None,
+                    language=self.language,
                     **tool_run_kwargs,
                 )
             return agent_action, observation

@@ -12,7 +12,7 @@ FORMAT_INSTRUCTIONS = """RESPONSE FORMAT INSTRUCTIONS
 
 When responding to me, please output a response in one of two formats:
 
-**Option 1:**
+**Option #1:**
 Use this if you want the human to use a tool.
 Markdown code snippet formatted in the following schema:
 

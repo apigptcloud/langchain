@@ -313,6 +313,7 @@ class ConversationalRetrievalChain(BaseConversationalRetrievalChain):
         condense_question_llm: Optional[BaseLanguageModel] = None,
         combine_docs_chain_kwargs: Optional[Dict] = None,
         callbacks: Callbacks = None,
+        language: Optional[str] = "en",
         **kwargs: Any,
     ) -> BaseConversationalRetrievalChain:
         """Convenience method to load chain from LLM and retriever.
@@ -335,6 +336,7 @@ class ConversationalRetrievalChain(BaseConversationalRetrievalChain):
             combine_docs_chain_kwargs: Parameters to pass as kwargs to `load_qa_chain`
                 when constructing the combine_docs_chain.
             callbacks: Callbacks to pass to all subchains.
+            language: Prompt language.
             **kwargs: Additional parameters to pass when initializing
                 ConversationalRetrievalChain
         """
@@ -344,6 +346,7 @@ class ConversationalRetrievalChain(BaseConversationalRetrievalChain):
             chain_type=chain_type,
             verbose=verbose,
             callbacks=callbacks,
+            language=language,
             **combine_docs_chain_kwargs,
         )
 

@@ -15,6 +15,7 @@ from langchain.chains.question_answering import (
     refine_prompts,
     stuff_prompt,
 )
+from langchain.chains.question_answering.prompts_zh import stuff_prompt as stuff_prompt_zh
 from langchain.chains.question_answering.map_rerank_prompt import (
     PROMPT as MAP_RERANK_PROMPT,
 )
@@ -67,9 +68,13 @@ def _load_stuff_chain(
     verbose: Optional[bool] = None,
     callback_manager: Optional[BaseCallbackManager] = None,
     callbacks: Callbacks = None,
+    language: Optional[str] = "en",
     **kwargs: Any,
 ) -> StuffDocumentsChain:
-    _prompt = prompt or stuff_prompt.PROMPT_SELECTOR.get_prompt(llm)
+    if language == "zh":
+        _prompt = prompt or stuff_prompt_zh.PROMPT_SELECTOR.get_prompt(llm)
+    else:
+        _prompt = prompt or stuff_prompt.PROMPT_SELECTOR.get_prompt(llm)
     llm_chain = LLMChain(
         llm=llm,
         prompt=_prompt,
@@ -218,6 +223,7 @@ def load_qa_chain(
     chain_type: str = "stuff",
     verbose: Optional[bool] = None,
     callback_manager: Optional[BaseCallbackManager] = None,
+    language: Optional[str] = "en",
     **kwargs: Any,
 ) -> BaseCombineDocumentsChain:
     """Load question answering chain.
@@ -229,6 +235,7 @@ def load_qa_chain(
         verbose: Whether chains should be run in verbose mode or not. Note that this
             applies to all chains that make up the final chain.
         callback_manager: Callback manager to use for the chain.
+        language: Language to use in prompts.
 
     Returns:
         A chain to use for question answering.
@@ -245,5 +252,5 @@ def load_qa_chain(
             f"Should be one of {loader_mapping.keys()}"
         )
     return loader_mapping[chain_type](
-        llm, verbose=verbose, callback_manager=callback_manager, **kwargs
+        llm, verbose=verbose, callback_manager=callback_manager, language=language, **kwargs
     )

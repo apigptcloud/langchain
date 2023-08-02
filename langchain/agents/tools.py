@@ -17,18 +17,25 @@ class InvalidTool(BaseTool):
     """Description of the tool."""
 
     def _run(
-        self, tool_name: str, run_manager: Optional[CallbackManagerForToolRun] = None
+        self, tool_name: str, run_manager: Optional[CallbackManagerForToolRun] = None, **kwargs
     ) -> str:
         """Use the tool."""
-        return f"{tool_name} is not a valid tool, try another one."
+        if kwargs["language"] == "zh":
+            return f"\"{tool_name}\" 不是一个有效的工具，请尝试其他工具。"
+        else:
+            return f"{tool_name} is not a valid tool, try another one."
 
     async def _arun(
         self,
         tool_name: str,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+        **kwargs,
     ) -> str:
         """Use the tool asynchronously."""
-        return f"{tool_name} is not a valid tool, try another one."
+        if kwargs["language"] == "zh":
+            return f"\"{tool_name}\" 不是一个有效的工具，请尝试其他工具。"
+        else:
+            return f"{tool_name} is not a valid tool, try another one."
 
 
 __all__ = ["InvalidTool", "BaseTool", "tool", "Tool"]

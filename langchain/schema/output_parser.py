@@ -96,7 +96,7 @@ class BaseOutputParser(BaseLLMOutputParser, ABC, Generic[T]):
         """
         return self.parse(completion)
 
-    def get_format_instructions(self) -> str:
+    def get_format_instructions(self, **kwargs) -> str:
         """Instructions on how the LLM output should be formatted."""
         raise NotImplementedError
 

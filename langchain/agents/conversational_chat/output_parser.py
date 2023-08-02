@@ -4,6 +4,7 @@ from typing import Union
 
 from langchain.agents import AgentOutputParser
 from langchain.agents.conversational_chat.prompt import FORMAT_INSTRUCTIONS
+from langchain.agents.conversational_chat.prompt_zh import FORMAT_INSTRUCTIONS as FORMAT_INSTRUCTIONS_ZH
 from langchain.output_parsers.json import parse_json_markdown
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
 
@@ -11,8 +12,12 @@ from langchain.schema import AgentAction, AgentFinish, OutputParserException
 class ConvoOutputParser(AgentOutputParser):
     """Output parser for the conversational agent."""
 
-    def get_format_instructions(self) -> str:
-        return FORMAT_INSTRUCTIONS
+    def get_format_instructions(self, **kwargs) -> str:
+        if "language" in kwargs:
+            if kwargs["language"] == "zh":
+                return FORMAT_INSTRUCTIONS_ZH
+        else:
+            return FORMAT_INSTRUCTIONS
 
     def parse(self, text: str) -> Union[AgentAction, AgentFinish]:
         try:

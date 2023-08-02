@@ -12,6 +12,11 @@ from langchain.agents.conversational_chat.prompt import (
     SUFFIX,
     TEMPLATE_TOOL_RESPONSE,
 )
+from langchain.agents.conversational_chat.prompt_zh import (
+    PREFIX as PREFIX_ZH,
+    SUFFIX as SUFFIX_ZH,
+    TEMPLATE_TOOL_RESPONSE as TEMPLATE_TOOL_RESPONSE_ZH,
+)
 from langchain.agents.utils import validate_tools_single_input
 from langchain.callbacks.base import BaseCallbackManager
 from langchain.chains import LLMChain
@@ -25,11 +30,13 @@ from langchain.schema import AgentAction, BaseOutputParser, BasePromptTemplate
 from langchain.schema.language_model import BaseLanguageModel
 from langchain.schema.messages import AIMessage, BaseMessage, HumanMessage
 from langchain.tools.base import BaseTool
+from langchain.agents.agent_types import AgentType
 
 
 class ConversationalChatAgent(Agent):
     """An agent designed to hold a conversation in addition to using tools."""
 
+    language = "en"
     output_parser: AgentOutputParser = Field(default_factory=ConvoOutputParser)
     template_tool_response: str = TEMPLATE_TOOL_RESPONSE
 
@@ -64,6 +71,7 @@ class ConversationalChatAgent(Agent):
         human_message: str = SUFFIX,
         input_variables: Optional[List[str]] = None,
         output_parser: Optional[BaseOutputParser] = None,
+        language: str = "en",
     ) -> BasePromptTemplate:
         tool_strings = "\n".join(
             [f"> {tool.name}: {tool.description}" for tool in tools]
@@ -71,7 +79,7 @@ class ConversationalChatAgent(Agent):
         tool_names = ", ".join([tool.name for tool in tools])
         _output_parser = output_parser or cls._get_default_output_parser()
         format_instructions = human_message.format(
-            format_instructions=_output_parser.get_format_instructions()
+            format_instructions=_output_parser.get_format_instructions(language=language)
         )
         final_prompt = format_instructions.format(
             tool_names=tool_names, tools=tool_strings
@@ -93,6 +101,8 @@ class ConversationalChatAgent(Agent):
         thoughts: List[BaseMessage] = []
         for action, observation in intermediate_steps:
             thoughts.append(AIMessage(content=action.log))
+            if self.language == "zh":
+                self.template_tool_response = TEMPLATE_TOOL_RESPONSE_ZH
             human_message = HumanMessage(
                 content=self.template_tool_response.format(observation=observation)
             )
@@ -109,8 +119,13 @@ class ConversationalChatAgent(Agent):
         system_message: str = PREFIX,
         human_message: str = SUFFIX,
         input_variables: Optional[List[str]] = None,
+        language: Optional[str] = "en",
         **kwargs: Any,
     ) -> Agent:
+        if language == "zh":
+            system_message = PREFIX_ZH
+            human_message = SUFFIX_ZH
+            cls.template_tool_response = TEMPLATE_TOOL_RESPONSE_ZH
         """Construct an agent from an LLM and tools."""
         cls._validate_tools(tools)
         _output_parser = output_parser or cls._get_default_output_parser()
@@ -120,6 +135,7 @@ class ConversationalChatAgent(Agent):
             human_message=human_message,
             input_variables=input_variables,
             output_parser=_output_parser,
+            language=language,
         )
         llm_chain = LLMChain(
             llm=llm,

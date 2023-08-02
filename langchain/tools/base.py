@@ -261,6 +261,7 @@ class BaseTool(ABC, BaseModel, metaclass=ToolMetaclass):
         *,
         tags: Optional[List[str]] = None,
         metadata: Optional[Dict[str, Any]] = None,
+        language: Optional[str] = "en",
         **kwargs: Any,
     ) -> Any:
         """Run the tool."""
@@ -284,10 +285,12 @@ class BaseTool(ABC, BaseModel, metaclass=ToolMetaclass):
             {"name": self.name, "description": self.description},
             tool_input if isinstance(tool_input, str) else str(tool_input),
             color=start_color,
+            language=language,
             **kwargs,
         )
         try:
             tool_args, tool_kwargs = self._to_args_and_kwargs(parsed_input)
+            tool_kwargs["language"] = language
             observation = (
                 self._run(*tool_args, run_manager=run_manager, **tool_kwargs)
                 if new_arg_supported
